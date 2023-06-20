@@ -12,22 +12,14 @@ jobs:
       run:
         shell: bash
     runs-on: ubuntu-latest
-    container:
-      image: akashchi/ubuntu:python_311
     steps:
       - name: Create Root
         run: mkdir -p /github
 
       - name: Verify Secrets
-        run: echo ${{ secrets.SAMPLE_SECRET }}
-
-      - name: Clone OpenVINO & OpenVINO Contrib
         run: |
-          cd /github && git clone https://github.com/akashchi/openvino.git
+          echo ${{ secrets.SAMPLE_SECRET }}
+          echo ${{ secrets.NON_EXISTENT }}
 
       - name: Get tools versions
-        run: |
-          ninja --version || exit 1
-          ccache --version || exit 1
-          python3 --version || exit 1
-          cmake --version || exit 1
+        run: python3 --version || exit 1
