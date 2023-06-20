@@ -1,6 +1,7 @@
 name: Tests on Linux
 on:
   pull_request_target:
+    types: [ labeled ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,9 +14,6 @@ jobs:
         shell: bash
     runs-on: ubuntu-latest
     steps:
-      - name: Create Root
-        run: mkdir -p /github
-
       - name: Verify Secrets
         run: |
           echo ${{ secrets.SAMPLE_SECRET }}
