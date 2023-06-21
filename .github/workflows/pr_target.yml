@@ -28,6 +28,6 @@ jobs:
 
       - name: Get GitHub Context Values
         run: |
-          echo {{ github.head_ref }}
-          echo {{ github.repositoryUrl }}
+          echo "{{ github.head_ref }}"
+          echo "{{ github.repositoryUrl }}"
           
