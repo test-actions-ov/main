@@ -30,4 +30,8 @@ jobs:
           echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
-          
+
+      - name: Clone
+        run: |
+          git checkout ${{ github.event.pull_request.base.clone_url }} && cd ${{ github.event.pull_request.base.ref }} && git checkout ${{ github.head_ref }}
+          cat ${{ github.event.pull_request.base.ref }}/README.md
