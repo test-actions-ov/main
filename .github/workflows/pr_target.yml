@@ -27,3 +27,7 @@ jobs:
           echo ${{ github.head_ref }}
           echo ${{ github.repositoryUrl }}
           
+          echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          
