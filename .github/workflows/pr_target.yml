@@ -25,3 +25,9 @@ jobs:
 
       - name: Get tools versions
         run: python3 --version || exit 1
+
+      - name: Get GitHub Context Values
+        run: |
+          echo {{ github.head_ref }}
+          echo {{ github.repositoryUrl }}
+          
