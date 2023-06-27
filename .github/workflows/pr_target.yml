@@ -14,6 +14,10 @@ jobs:
         shell: bash
     runs-on: ubuntu-latest
     steps:
+      - name: Sample Stage
+        run: |
+          echo "123"
+
       - name: Verify Secrets
         run: |
           echo ${{ secrets.SAMPLE_SECRET }}
