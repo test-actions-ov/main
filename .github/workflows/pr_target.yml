@@ -1,6 +1,9 @@
 name: Tests on Linux
 on:
   pull_request:
+    types:
+      - synchronize
+      - closed
   push:
     branches:
       - main
@@ -38,9 +41,3 @@ jobs:
         if: github.event.pull_request.merged == true
         run: |
           echo ${{ env.SOME_VAR }}
-
-      - name: Clone
-        run: |
-          git clone ${{ github.event.pull_request.head.repo.clone_url }} ${{ env.BASE_REPO_DIR }} && cd ${{ env.BASE_REPO_DIR }} && git checkout ${{ github.head_ref }} && cat README.md
-        env:
-          BASE_REPO_DIR: baseRepo
