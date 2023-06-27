@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Sample Stage
         run: |
-          echo "123"
+          echo "1234"
 
       - name: Get GitHub Context Values
         run: |
