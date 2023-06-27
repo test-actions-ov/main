@@ -1,11 +1,6 @@
 name: Tests on Linux
 on:
   pull_request:
-    types:
-      - synchronize
-      - opened
-      - reopened
-      - closed
   push:
     branches:
       - main
@@ -34,12 +29,12 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
 
-      - name: Set Var if Merged
-        if: github.event.pull_request.merged == true
+      - name: Set Var in Main
+        if: github.ref_name == 'main'
         run: |
           echo "SOME_VAR=true" >> $GITHUB_ENV
 
       - name: Check Var
-        if: github.event.pull_request.merged == true
+        if: github.ref_name == 'main'
         run: |
           echo ${{ env.SOME_VAR }}
