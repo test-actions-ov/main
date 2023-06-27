@@ -1,7 +1,6 @@
 name: Tests on Linux
 on:
-  pull_request_target:
-    types: [ labeled ]
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
