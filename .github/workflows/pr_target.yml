@@ -17,14 +17,6 @@ jobs:
         run: |
           echo "123"
 
-      - name: Verify Secrets
-        run: |
-          echo ${{ secrets.SAMPLE_SECRET }}
-          echo ${{ secrets.NON_EXISTENT }}
-
-      - name: Get tools versions
-        run: python3 --version || exit 1
-
       - name: Get GitHub Context Values
         run: |
           echo ${{ github.head_ref }}
