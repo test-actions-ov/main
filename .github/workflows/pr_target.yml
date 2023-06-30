@@ -45,13 +45,13 @@ jobs:
         run: |
           echo ${{ env.SOME_VAR }}
 
-#      - name: Clone OpenVINO
-#        uses: actions/checkout@v3
-#        with:
-#          repository: 'akashchi/openvino'
-#          ref: 'ci/test-gha'
-#          path: 'openvino'
-#          submodules: 'recursive'
+      - name: Clone OpenVINO
+        uses: actions/checkout@v3
+        with:
+          repository: 'akashchi/openvino'
+          ref: 'ci/test-gha'
+          path: 'openvino'
+          submodules: 'recursive'
 
       - name: Setup Python Conditionally
         uses: actions/setup-python@v4
@@ -60,3 +60,5 @@ jobs:
           cache: 'pip'
           cache-dependency-path: '**/requirements*.txt'
 
+      - name: Install sample dep
+        run: python3 -m pip install -r ${{ github.workspace }}/openvino/tools/mo/requirements_tf2.txt
