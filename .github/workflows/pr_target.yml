@@ -35,7 +35,10 @@ jobs:
           echo "SOME_VAR=true" >> $GITHUB_ENV
 
       - name: Evaluate
-        run: ${{ github.ref_name }} == 'main'
+        run: |
+          if [[ ${{ github.ref_name }} == 'main' ]]; then
+            echo "111"
+          fi
 
       - name: Check Var
         if: github.ref_name == 'main'
