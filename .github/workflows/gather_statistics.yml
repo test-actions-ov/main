@@ -100,7 +100,8 @@ jobs:
             let workflowRuns = await github.rest.actions.listWorkflowRuns({
               'owner': context.payload.repository.organization,
               'repo': context.payload.repository.name,
-              'workflow_id': 'gather_statistics.yml'
+              'workflow_id': 'gather_statistics.yml',
+              'status': 'completed'
             })
             console.log(JSON.stringify(workflowRuns))
 #      - uses: actions/setup-python@v4
