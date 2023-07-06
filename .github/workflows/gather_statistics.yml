@@ -100,10 +100,18 @@ jobs:
             
             let date = new Date();
             
-            let day = date.getDate();
+            var day = date.getDate();
             // Month is starting from 0 for some reason
-            let month = date.getMonth() + 1;
+            var month = date.getMonth() + 1;
             let year = date.getFullYear();
+            
+            if (day < 10) {
+              day = `0${day}`
+            }
+            
+            if (month < 10) {
+              month = `0${month}`
+            }
             
             // Only gather workflow runs that ran on the specified date or after
             let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
