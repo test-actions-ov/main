@@ -70,6 +70,9 @@ jobs:
         with:
           script: |
             console.log(context)
+            console.log(context.runId)
+            console.log(context.payload.repository.full_name)
+            
 
 #            github.rest.actions.listJobsForWorkflowRun({
 #              ''
