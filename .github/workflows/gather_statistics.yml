@@ -73,7 +73,7 @@ jobs:
             console.log(context.runId)
             console.log(context.payload.repository.full_name)
             
-            let workflowJobs = github.rest.actions.listJobsForWorkflowRun({
+            let workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
               'owner': context.payload.repository.organization,
               'repo': context.payload.repository.name,
               'run_id': context.runId
