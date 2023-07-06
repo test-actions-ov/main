@@ -107,6 +107,7 @@ jobs:
             
             // Only gather workflow runs that ran on the specified date or after
             let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
+            console.log(`CURRENT DATE: ${dateToStartGatheringFrom}`)
             
             let workflowRuns = await github.rest.actions.listWorkflowRuns({
               'owner': context.payload.repository.organization,
