@@ -73,10 +73,12 @@ jobs:
             console.log(context.runId)
             console.log(context.payload.repository.full_name)
             
-
-#            github.rest.actions.listJobsForWorkflowRun({
-#              ''
-#            })
+            let workflowJobs = github.rest.actions.listJobsForWorkflowRun({
+              context.payload.repository.organization,
+              context.payload.repository.name,
+              context.runId
+            })
+            console.log(workflowJobs)
 
 #      - uses: actions/setup-python@v4
 #        with:
