@@ -87,13 +87,22 @@ jobs:
             })
             console.log(JSON.stringify(workflowJobs))
             
-            let billableTime = await github.rest.actions.getWorkflowRunUsage({
+#            let timeSpent = await github.rest.actions.getWorkflowRunUsage({
+#              'owner': context.payload.repository.organization,
+#              'repo': context.payload.repository.name,
+#              'run_id': context.runId
+#            })
+#            console.log(JSON.stringify(timeSpent))
+      - name: List All Workflow Runs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let workflowRuns = await github.rest.actions.listWorkflowRuns({
               'owner': context.payload.repository.organization,
               'repo': context.payload.repository.name,
               'run_id': context.runId
             })
-            console.log(JSON.stringify(billableTime))
-
+            console.log(JSON.stringify(workflowRuns))
 #      - uses: actions/setup-python@v4
 #        with:
 #          python-version: '3.11'
