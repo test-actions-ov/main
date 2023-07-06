@@ -20,44 +20,44 @@ jobs:
         run: |
           echo "123"
 
-      - name: Get GitHub Context Values
-        run: |
-          echo ${{ github.head_ref }}
-          echo ${{ github.repositoryUrl }}
-          
-          echo "$GITHUB_CONTEXT"
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-
-      - name: Set Var in Main
-        if: github.ref_name == 'main'
-        run: |
-          echo "SOME_VAR=true" >> $GITHUB_ENV
-
-      - name: Evaluate
-        run: |
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "111"
-          fi
-
-      - name: Check Var
-        if: github.ref_name == 'main'
-        run: |
-          echo ${{ env.SOME_VAR }}
-
-      - name: Clone OpenVINO
-        uses: actions/checkout@v3
-        with:
-          repository: 'akashchi/openvino'
-          ref: 'ci/test-gha'
-          path: 'openvino'
-
-      - name: Setup Python Conditionally
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ github.ref_name == 'main' && '3.11' || '3.7'  }}
-          cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
-
-      - name: Install sample dep
-        run: python3 -m pip install -r ${{ github.workspace }}/openvino/tools/mo/requirements_tf2.txt
+#      - name: Get GitHub Context Values
+#        run: |
+#          echo ${{ github.head_ref }}
+#          echo ${{ github.repositoryUrl }}
+#
+#          echo "$GITHUB_CONTEXT"
+#        env:
+#          GITHUB_CONTEXT: ${{ toJSON(github) }}
+#
+#      - name: Set Var in Main
+#        if: github.ref_name == 'main'
+#        run: |
+#          echo "SOME_VAR=true" >> $GITHUB_ENV
+#
+#      - name: Evaluate
+#        run: |
+#          if [[ "${{ github.ref_name }}" == "main" ]]; then
+#            echo "111"
+#          fi
+#
+#      - name: Check Var
+#        if: github.ref_name == 'main'
+#        run: |
+#          echo ${{ env.SOME_VAR }}
+#
+#      - name: Clone OpenVINO
+#        uses: actions/checkout@v3
+#        with:
+#          repository: 'akashchi/openvino'
+#          ref: 'ci/test-gha'
+#          path: 'openvino'
+#
+#      - name: Setup Python Conditionally
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: ${{ github.ref_name == 'main' && '3.11' || '3.7'  }}
+#          cache: 'pip'
+#          cache-dependency-path: '**/requirements*.txt'
+#
+#      - name: Install sample dep
+#        run: python3 -m pip install -r ${{ github.workspace }}/openvino/tools/mo/requirements_tf2.txt
