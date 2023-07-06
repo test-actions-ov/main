@@ -65,6 +65,13 @@ jobs:
 #          sudo -E apt update
 #          sudo -E apt --assume-yes install openjdk-11-jdk libbz2-dev clang unzip libpugixml-dev libtbb-dev intel-opencl-icd ocl-icd-opencl-dev opencl-headers
 
+  Gather_Statisitcs:
+    needs: Build
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    steps:
       - name: Gather Workflow Run Statistics
         uses: actions/github-script@v6
         with:
@@ -72,13 +79,20 @@ jobs:
             console.log(context)
             console.log(context.runId)
             console.log(context.payload.repository.full_name)
-            
+
             let workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
               'owner': context.payload.repository.organization,
               'repo': context.payload.repository.name,
               'run_id': context.runId
             })
             console.log(JSON.stringify(workflowJobs))
+            
+            let billableTime = await github.rest.actions.getWorkflowRunUsage({
+              'owner': context.payload.repository.organization,
+              'repo': context.payload.repository.name,
+              'run_id': context.runId
+            })
+            console.log(JSON.stringify(billableTime))
 
 #      - uses: actions/setup-python@v4
 #        with:
