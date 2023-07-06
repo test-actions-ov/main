@@ -78,7 +78,7 @@ jobs:
               'repo': context.payload.repository.name,
               'run_id': context.runId
             })
-            console.log(workflowJobs)
+            console.log(JSON.stringify(workflowJobs))
 
 #      - uses: actions/setup-python@v4
 #        with:
