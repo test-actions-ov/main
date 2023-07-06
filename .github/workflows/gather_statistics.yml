@@ -101,7 +101,8 @@ jobs:
               'owner': context.payload.repository.organization,
               'repo': context.payload.repository.name,
               'workflow_id': 'gather_statistics.yml',
-              'status': 'completed'
+              'status': 'completed',
+              'created': '>=2023-07-06'
             })
             console.log(JSON.stringify(workflowRuns))
 #      - uses: actions/setup-python@v4
