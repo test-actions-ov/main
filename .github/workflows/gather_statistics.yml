@@ -63,7 +63,9 @@ jobs:
             }
             
             // Only gather workflow runs that ran on the specified date or after
-            let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
+            // let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
+            
+            let dateToStartGatheringFrom = `>=2023-07-05`
             console.log(`dateToStartGatheringFrom: ${dateToStartGatheringFrom}`)
             
             // TODO: use context.payload.repository.organization
@@ -75,7 +77,7 @@ jobs:
             let workflowRuns = await github.rest.actions.listWorkflowRuns({
               'owner': org,
               'repo': repositoryName,
-              'workflow_id': 'gather_statistics.yml',
+              'workflow_id': 'test_linux.yml',
               'status': 'completed',
               'created': dateToStartGatheringFrom
             })
