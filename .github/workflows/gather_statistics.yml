@@ -86,13 +86,13 @@ jobs:
             let artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns.json`
             
             var fs = require('fs');
-            fs.writeFile(artifactPath, workflowRuns, function(err) {
+            fs.writeFile(artifactPath, JSON.stringify(workflowRuns), function(err) {
                 if (err) {
                     console.log(err);
                 }
             });
 
-      - name: Upload openvino tests package
+      - name: Upload gathered data
         uses: actions/upload-artifact@v3
         with:
           name: workflowRuns
