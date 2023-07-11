@@ -91,7 +91,9 @@ jobs:
 
                 workflowRunStats['Run ID'] = runID
                 workflowRunStats['URL'] = workflowData.html_url
+                workflowRunStats['Author'] = workflowData.actor.login
                 workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : 'Did not start'
+                workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
 
@@ -130,6 +132,8 @@ jobs:
                 var row = {
                     'Run ID': entry['Run ID'],
                     'URL': entry.URL,
+                    'Author': entry.Author,
+                    'Commit Time': entry['Commit Time'],
                     'Started At': entry['Started At'],
                     'Status': entry.Status,
                     'Total Pipeline Duration (Mins)': entry['Total Duration']
@@ -152,6 +156,6 @@ jobs:
       - name: Upload gathered data
         uses: actions/upload-artifact@v3
         with:
-          name: Workflow Runs
+          name: Workflow Runs Statistics
           path: ${{ env.ARTIFACTS_DIR }}/workflowRuns*.xlsx
           if-no-files-found: 'error'
