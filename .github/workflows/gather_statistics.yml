@@ -68,10 +68,10 @@ jobs:
             const org = 'openvinotoolkit'
             
             // TODO: use context.payload.repository.name
-            const repositoryName = 'openvino_contrib'
+            const repositoryName = 'openvino'
 
             // TODO: use desired name
-            const pipelineName = 'test_linux.yml'
+            const pipelineName = 'linux.yml'
             
             const workflowRunsData = await github.rest.actions.listWorkflowRuns({
               'owner': org,
