@@ -109,7 +109,7 @@ jobs:
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
 
-                const workflowDuration = await octokit.rest.actions.getWorkflowRunUsage({
+                const workflowDuration = await github.rest.actions.getWorkflowRunUsage({
                     'owner': org,
                     'repo': repositoryName,
                     'run_id': runID
@@ -117,7 +117,7 @@ jobs:
 
                 workflowRunStats['Total Duration'] = workflowDuration.data.run_duration_ms ? workflowDuration.data.run_duration_ms / 1000 / 60 : undefined
 
-                const workflowJobs = await octokit.rest.actions.listJobsForWorkflowRun({
+                const workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
                     'owner': org,
                     'repo': repositoryName,
                     'run_id': runID
@@ -155,11 +155,11 @@ jobs:
                 rows.push(row);
             });
               
-            var worksheet = XLSX.utils.json_to_sheet(rows);
-            var workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+            const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Workflow Runs');
 
-            let artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns.xlsx`
+            const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns.xlsx`
 
             XLSX.writeFile(workbook, artifactPath);
 
