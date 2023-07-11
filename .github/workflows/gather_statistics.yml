@@ -132,10 +132,10 @@ jobs:
                     'URL': entry.URL,
                     'Started At': entry['Started At'],
                     'Status': entry.Status,
-                    'Total Duration': entry['Total Duration']
+                    'Total Duration (Mins)': entry['Total Duration']
                 };
                 entry.Jobs.forEach(function (job) {
-                    row[job.Job + '_Duration'] = job.Duration;
+                    row[job.Job + '_Duration (Mins)'] = job.Duration;
                     row[job.Job + '_Status'] = job.Status;
                 });
                 rows.push(row);
