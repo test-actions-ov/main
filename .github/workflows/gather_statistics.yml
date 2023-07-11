@@ -57,7 +57,7 @@ jobs:
             var XLSX = require('xlsx');
 
             // load 'fs' for readFile and writeFile support
-            XLSX.set_fs(fs);
+            // XLSX.set_fs(fs);
             
             let date = new Date();
             
