@@ -132,11 +132,11 @@ jobs:
                     'URL': entry.URL,
                     'Started At': entry['Started At'],
                     'Status': entry.Status,
-                    'Total Duration (Mins)': entry['Total Duration']
+                    'Total Pipeline Duration (Mins)': entry['Total Duration']
                 };
                 entry.Jobs.forEach(function (job) {
-                    row[job.Job + '_Duration (Mins)'] = job.Duration;
-                    row[job.Job + '_Status'] = job.Status;
+                    row[job.Job + '_Job_Status'] = job.Status;
+                    row[job.Job + '_Job_Duration (Mins)'] = job.Duration;
                 });
                 rows.push(row);
             });
