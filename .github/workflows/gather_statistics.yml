@@ -42,10 +42,22 @@ jobs:
 #              'run_id': context.runId
 #            })
 #            console.log(JSON.stringify(timeSpent))
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm install xlsx
+      
       - name: List All Workflow Runs
         uses: actions/github-script@v6
         with:
           script: |
+            var fs = require('fs');
+            var XLSX = require('xlsx');
+
+            // load 'fs' for readFile and writeFile support
+            XLSX.set_fs(fs);
             
             let date = new Date();
             
@@ -65,16 +77,16 @@ jobs:
             // Only gather workflow runs that ran on the specified date or after
             // let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
             
-            let dateToStartGatheringFrom = `>=2023-07-05`
+            const dateToStartGatheringFrom = `>=2023-07-05`
             console.log(`dateToStartGatheringFrom: ${dateToStartGatheringFrom}`)
             
             // TODO: use context.payload.repository.organization
-            let org = 'openvinotoolkit'
+            const org = 'openvinotoolkit'
             
             // TODO: use context.payload.repository.name
-            let repositoryName = 'openvino_contrib'
+            const repositoryName = 'openvino_contrib'
             
-            let workflowRuns = await github.rest.actions.listWorkflowRuns({
+            const workflowRuns = await github.rest.actions.listWorkflowRuns({
               'owner': org,
               'repo': repositoryName,
               'workflow_id': 'test_linux.yml',
@@ -83,18 +95,77 @@ jobs:
             })
             // console.log(JSON.stringify(workflowRuns))
             
-            let artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns.json`
-            
-            var fs = require('fs');
-            fs.writeFile(artifactPath, JSON.stringify(workflowRuns), function(err) {
-                if (err) {
-                    console.log(err);
+            const workflowRunsStats = []
+
+            for (const workflowData of workflowRunsData.data.workflow_runs) {
+
+                const workflowRunStats = {}
+
+                const runID = workflowData.id
+
+                workflowRunStats['Run ID'] = runID
+                workflowRunStats['URL'] = workflowData.html_url
+                workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : 'Did not start'
+                workflowRunStats['Status'] = workflowData.conclusion
+                workflowRunStats['Jobs'] = []
+
+                const workflowDuration = await octokit.rest.actions.getWorkflowRunUsage({
+                    'owner': org,
+                    'repo': repositoryName,
+                    'run_id': runID
+                })
+
+                workflowRunStats['Total Duration'] = workflowDuration.data.run_duration_ms ? workflowDuration.data.run_duration_ms / 1000 / 60 : undefined
+
+                const workflowJobs = await octokit.rest.actions.listJobsForWorkflowRun({
+                    'owner': org,
+                    'repo': repositoryName,
+                    'run_id': runID
+                })
+                
+                for (const workflowJob of workflowJobs.data.jobs) {
+
+                    const jobStart = new Date(workflowJob.started_at)
+                    const jobEnd = new Date(workflowJob.completed_at)
+                    const jobDuration = Math.abs(jobEnd - jobStart) / 1000 / 60
+
+                    workflowRunStats['Jobs'].push({
+                        Job: workflowJob.name,
+                        Duration: jobDuration,
+                        Status: workflowJob.conclusion
+                    })
                 }
+
+                workflowRunsStats.push(workflowRunStats)
+            }
+
+            var rows = [];
+            workflowRunsStats.forEach(function (entry) {
+                var row = {
+                    'Run ID': entry['Run ID'],
+                    'URL': entry.URL,
+                    'Started At': entry['Started At'],
+                    'Status': entry.Status,
+                    'Total Duration': entry['Total Duration']
+                };
+                entry.Jobs.forEach(function (job) {
+                    row[job.Job + '_Duration'] = job.Duration;
+                    row[job.Job + '_Status'] = job.Status;
+                });
+                rows.push(row);
             });
+              
+            var worksheet = XLSX.utils.json_to_sheet(rows);
+            var workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Workflow Runs');
+
+            let artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns.xlsx`
+
+            XLSX.writeFile(workbook, artifactPath);
 
       - name: Upload gathered data
         uses: actions/upload-artifact@v3
         with:
           name: workflowRuns
-          path: ${{ env.ARTIFACTS_DIR }}/workflowRuns.json
+          path: ${{ env.ARTIFACTS_DIR }}/workflowRuns.xlsx
           if-no-files-found: 'error'
