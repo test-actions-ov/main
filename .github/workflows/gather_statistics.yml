@@ -91,7 +91,8 @@ jobs:
 
                 workflowRunStats['Run ID'] = runID
                 workflowRunStats['URL'] = workflowData.html_url
-                workflowRunStats['Author'] = workflowData.actor.login
+                workflowRunStats['Author'] = workflowData.head_commit.author.name
+                workflowRunStats['Source Branch'] = workflowData.head_branch
                 workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : 'Did not start'
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
                 workflowRunStats['Status'] = workflowData.conclusion
@@ -134,7 +135,8 @@ jobs:
                     'URL': entry.URL,
                     'Author': entry.Author,
                     'Commit Time': entry['Commit Time'],
-                    'Started At': entry['Started At'],
+                    'Source Branch': entry['Source Branch'],
+                    'Pipeline Started At': entry['Started At'],
                     'Status': entry.Status,
                     'Total Pipeline Duration (Mins)': entry['Total Duration']
                 };
