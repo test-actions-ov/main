@@ -145,7 +145,7 @@ jobs:
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Workflow Runs');
 
-            const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns_from_${dateToStartGatheringFrom}.xlsx`
+            const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns_from_${day}_${month}_${year}.xlsx`
 
             XLSX.writeFile(workbook, artifactPath);
 
