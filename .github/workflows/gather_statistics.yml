@@ -86,14 +86,14 @@ jobs:
             // TODO: use context.payload.repository.name
             const repositoryName = 'openvino_contrib'
             
-            const workflowRuns = await github.rest.actions.listWorkflowRuns({
+            const workflowRunsData = await github.rest.actions.listWorkflowRuns({
               'owner': org,
               'repo': repositoryName,
               'workflow_id': 'test_linux.yml',
               'status': 'completed',
               'created': dateToStartGatheringFrom
             })
-            // console.log(JSON.stringify(workflowRuns))
+            // console.log(JSON.stringify(workflowRunsData))
             
             const workflowRunsStats = []
 
