@@ -28,20 +28,6 @@ jobs:
             console.log(context)
             console.log(context.runId)
             console.log(context.payload.repository.full_name)
-
-#            let workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
-#              'owner': context.payload.repository.organization,
-#              'repo': context.payload.repository.name,
-#              'run_id': context.runId
-#            })
-#            console.log(JSON.stringify(workflowJobs))
-            
-#            let timeSpent = await github.rest.actions.getWorkflowRunUsage({
-#              'owner': context.payload.repository.organization,
-#              'repo': context.payload.repository.name,
-#              'run_id': context.runId
-#            })
-#            console.log(JSON.stringify(timeSpent))
       
       - uses: actions/setup-node@v3
         with:
@@ -49,17 +35,14 @@ jobs:
 
       - run: npm install xlsx
       
-      - name: List All Workflow Runs
+      - name: Gather Workflows Data
         uses: actions/github-script@v6
         with:
           script: |
             var fs = require('fs');
             var XLSX = require('xlsx');
-
-            // load 'fs' for readFile and writeFile support
-            // XLSX.set_fs(fs);
             
-            let date = new Date();
+            const date = new Date();
             
             var day = date.getDate();
             // Month is starting from 0 for some reason
@@ -77,6 +60,7 @@ jobs:
             // Only gather workflow runs that ran on the specified date or after
             // let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
             
+            // TODO: use dynamic date
             const dateToStartGatheringFrom = `>=2023-07-05`
             console.log(`dateToStartGatheringFrom: ${dateToStartGatheringFrom}`)
             
@@ -85,15 +69,17 @@ jobs:
             
             // TODO: use context.payload.repository.name
             const repositoryName = 'openvino_contrib'
+
+            // TODO: use desired name
+            const pipelineName = 'test_linux.yml'
             
             const workflowRunsData = await github.rest.actions.listWorkflowRuns({
               'owner': org,
               'repo': repositoryName,
-              'workflow_id': 'test_linux.yml',
+              'workflow_id': pipelineName,
               'status': 'completed',
               'created': dateToStartGatheringFrom
             })
-            // console.log(JSON.stringify(workflowRunsData))
             
             const workflowRunsStats = []
 
@@ -159,13 +145,13 @@ jobs:
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Workflow Runs');
 
-            const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns.xlsx`
+            const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns_from_${dateToStartGatheringFrom}.xlsx`
 
             XLSX.writeFile(workbook, artifactPath);
 
       - name: Upload gathered data
         uses: actions/upload-artifact@v3
         with:
-          name: workflowRuns
-          path: ${{ env.ARTIFACTS_DIR }}/workflowRuns.xlsx
+          name: Workflow Runs
+          path: ${{ env.ARTIFACTS_DIR }}/workflowRuns*.xlsx
           if-no-files-found: 'error'
