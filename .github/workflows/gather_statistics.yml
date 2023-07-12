@@ -39,15 +39,15 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            var fs = require('fs');
-            var XLSX = require('xlsx');
+            const fs = require('fs');
+            const XLSX = require('xlsx');
             
             const date = new Date();
             
             var day = date.getDate();
             // Month is starting from 0 for some reason
             var month = date.getMonth() + 1;
-            let year = date.getFullYear();
+            const year = date.getFullYear();
             
             if (day < 10) {
               day = `0${day}`
@@ -58,7 +58,7 @@ jobs:
             }
             
             // Only gather workflow runs that ran on the specified date or after
-            // let dateToStartGatheringFrom = `>=${year}-${month}-${day}`
+            // const dateToStartGatheringFrom = `>=${year}-${month}-${day}`
             
             // TODO: use dynamic date
             const dateToStartGatheringFrom = `>=2023-07-05`
@@ -130,7 +130,7 @@ jobs:
 
             var rows = [];
             workflowRunsStats.forEach(function (entry) {
-                var row = {
+                const row = {
                     'Run ID': entry['Run ID'],
                     'URL': entry.URL,
                     'Author': entry.Author,
