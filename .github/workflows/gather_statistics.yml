@@ -82,6 +82,8 @@ jobs:
             })
             
             const workflowRunsStats = []
+            
+            console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
 
             for (const workflowData of workflowRunsData.data.workflow_runs) {
 
@@ -127,6 +129,8 @@ jobs:
 
                 workflowRunsStats.push(workflowRunStats)
             }
+            
+            console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
 
             var rows = [];
             workflowRunsStats.forEach(function (entry) {
@@ -146,6 +150,8 @@ jobs:
                 });
                 rows.push(row);
             });
+            
+            console.log(`TOTAL # OF ROWS TO WRITE: ${rows.length}`)
               
             const worksheet = XLSX.utils.json_to_sheet(rows);
             const workbook = XLSX.utils.book_new();
