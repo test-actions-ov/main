@@ -91,7 +91,7 @@ jobs:
 
             for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
 
-                let workflowRunsData = await octokit.rest.actions.listWorkflowRuns({
+                let workflowRunsData = await github.rest.actions.listWorkflowRuns({
                     'owner': org,
                     'repo': repositoryName,
                     'workflow_id': 'linux.yml',
