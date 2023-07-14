@@ -28,7 +28,9 @@ jobs:
             console.log(context)
             console.log(context.runId)
             console.log(context.payload.repository.full_name)
-            console.log(${{ github.head_ref }})
+      
+      - name: Check Head Ref
+        run: echo ${{ github.head_ref }}
       
       - uses: actions/setup-node@v3
         with:
