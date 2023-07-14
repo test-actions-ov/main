@@ -38,6 +38,7 @@ jobs:
       - name: Gather Workflows Data
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.MY_PAT }}
           script: |
             const fs = require('fs');
             const XLSX = require('xlsx');
