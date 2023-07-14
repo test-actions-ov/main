@@ -165,15 +165,15 @@ jobs:
                     }
                 }
                 workflowRunsStats.push(workflowRunStats)
-            }
 
-            if (workflowData.run_started_at && pipelineEndDate) {
-                const start = new Date(workflowData.run_started_at)
-                const end = new Date(pipelineEndDate)
-                workflowDuration = Math.abs(end - start) / 1000 / 60
-            }
+                if (workflowData.run_started_at && pipelineEndDate) {
+                    const start = new Date(workflowData.run_started_at)
+                    const end = new Date(pipelineEndDate)
+                    workflowDuration = Math.abs(end - start) / 1000 / 60
+                }
 
-            workflowRunStats['Total Duration'] = workflowDuration
+                workflowRunStats['Total Duration'] = workflowDuration
+            }
             
             console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
 
