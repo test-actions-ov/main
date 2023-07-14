@@ -42,6 +42,10 @@ jobs:
             const fs = require('fs');
             const XLSX = require('xlsx');
             
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
             const date = new Date();
             
             var day = date.getDate();
@@ -90,6 +94,8 @@ jobs:
             const workflowRunsStats = []
 
             for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
+            
+                console.log(`Gathering page #${pageNumber}.`)
 
                 let workflowRunsData = await github.rest.actions.listWorkflowRuns({
                     'owner': org,
@@ -102,6 +108,9 @@ jobs:
                 })
 
                 workflowRuns.push(...workflowRunsData.data.workflow_runs)
+                
+                console.log(`Sleeping for 10 seconds.`)
+                await sleep(10 * 1000);
             }
             
             console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
