@@ -145,7 +145,7 @@ jobs:
                 //    'run_id': runID
                 //})
 
-                workflowRunStats['Total Duration (Mins)'] = workflowDuration
+                workflowRunStats['Total Duration'] = workflowDuration
 
                 const workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
                     'owner': org,
