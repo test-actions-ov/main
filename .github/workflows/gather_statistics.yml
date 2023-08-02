@@ -49,9 +49,9 @@ jobs:
             
             const date = new Date();
             
-            var day = date.getDate();
+            let day = date.getDate();
             // Month is starting from 0 for some reason
-            var month = date.getMonth() + 1;
+            let month = date.getMonth() + 1;
             const year = date.getFullYear();
             
             if (day < 10) {
@@ -89,6 +89,7 @@ jobs:
             
             const perPageCount = 100
             const pagesToCollect = Math.ceil(workflowRunsData.data.total_count / perPageCount)
+            console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
             console.log(`PAGES TO COLLECT: ${pagesToCollect}`)
             
             const workflowRuns = []
@@ -109,12 +110,11 @@ jobs:
                 })
 
                 workflowRuns.push(...workflowRunsData.data.workflow_runs)
+                console.log(`workflowRuns LENGTH AFTER PAGE COLLECTION: ${workflowRuns.length}`)
                 
                 console.log(`Sleeping for 10 seconds.`)
                 await sleep(10 * 1000);
             }
-            
-            console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
 
             for (const workflowData of workflowRuns) {
 
@@ -131,8 +131,8 @@ jobs:
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
             
-                var pipelineEndDate;
-                var workflowDuration = 0
+                let pipelineEndDate;
+                let workflowDuration = 0
 
                 //const workflowDuration = await github.rest.actions.getWorkflowRunUsage({
                 //    'owner': org,
@@ -177,7 +177,7 @@ jobs:
             
             console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
 
-            var rows = [];
+            let rows = [];
             workflowRunsStats.forEach(function (entry) {
                 const row = {
                     'Run ID': entry['Run ID'],
