@@ -78,6 +78,7 @@ jobs:
             // TODO: use desired name
             const pipelineName = 'linux.yml'
             
+            // Check how many pipelines were executed
             const workflowRunsData = await github.rest.actions.listWorkflowRuns({
               'owner': org,
               'repo': repositoryName,
@@ -87,7 +88,7 @@ jobs:
               'per_page': 1
             })
             
-            const perPageCount = 100
+            const perPageCount = 50
             const pagesToCollect = Math.ceil(workflowRunsData.data.total_count / perPageCount)
             console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
             console.log(`PAGES TO COLLECT: ${pagesToCollect}`)
@@ -97,9 +98,9 @@ jobs:
 
             for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
             
-                console.log(`Gathering page #${pageNumber}.`)
+                console.log(`Collecting page #${pageNumber}.`)
 
-                let workflowRunsData = await github.rest.actions.listWorkflowRuns({
+                let workflowRunsDataPerPage = await github.rest.actions.listWorkflowRuns({
                     'owner': org,
                     'repo': repositoryName,
                     'workflow_id': 'linux.yml',
@@ -108,12 +109,14 @@ jobs:
                     'per_page': perPageCount,
                     'page': pageNumber
                 })
+            
+                console.log(`workflowsPerPageCount: ${workflowRunsDataPerPage.data.workflow_runs.length}`)
 
-                workflowRuns.push(...workflowRunsData.data.workflow_runs)
+                workflowRuns.push(...workflowRunsDataPerPage.data.workflow_runs)
                 console.log(`workflowRuns LENGTH AFTER PAGE COLLECTION: ${workflowRuns.length}`)
                 
-                console.log(`Sleeping for 10 seconds.`)
-                await sleep(10 * 1000);
+                console.log(`Sleeping for 2 seconds.`)
+                await sleep(2 * 1000);
             }
 
             for (const workflowData of workflowRuns) {
