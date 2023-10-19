@@ -128,7 +128,6 @@ jobs:
                 workflowRunStats['Run ID'] = runID
                 workflowRunStats['URL'] = workflowData.html_url
                 workflowRunStats['Author'] = workflowData.head_commit.author.name
-                workflowRunStats['Runner'] = workflowData.labels ? workflowData.labels[0] : 'No data'
                 workflowRunStats['Source Branch'] = workflowData.head_branch
                 workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : undefined
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
@@ -155,11 +154,14 @@ jobs:
                     const jobStart = new Date(workflowJob.started_at)
                     const jobEnd = new Date(workflowJob.completed_at)
                     const jobDuration = Math.abs(jobEnd - jobStart) / 1000 / 60
+                    const runner = workflowData.labels ? workflowData.labels[0] : 'No data'
+
 
                     workflowRunStats['Jobs'].push({
                         Job: workflowJob.name,
                         Duration: jobDuration,
-                        Status: workflowJob.conclusion
+                        Status: workflowJob.conclusion,
+                        Runner: runner
                     })
 
                     // The longest job out of those running in parallel
@@ -182,12 +184,11 @@ jobs:
             console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
 
             let rows = [];
-            workflowRunsStats.forEach(function (entry) {
+            workflowRunsStats.forEach(function (entry, index) {
                 const row = {
                     'Run ID': entry['Run ID'],
                     'URL': entry.URL,
                     'Author': entry.Author,
-                    'Runner': entry.Runner,
                     'Commit Time': entry['Commit Time'],
                     'Source Branch': entry['Source Branch'],
                     'Pipeline Started At': entry['Started At'],
@@ -197,8 +198,12 @@ jobs:
                 entry.Jobs.forEach(function (job) {
                     row[job.Job + '_Job_Status'] = job.Status;
                     row[job.Job + '_Job_Duration (Mins)'] = job.Duration;
+                    row[job.Job + '_Job_Runner'] = job.Runner;
                 });
                 rows.push(row);
+                if (!rows.length % 100) {
+                  console.log(`Done with ${rows.length}...`)
+                }
             });
             
             console.log(`TOTAL # OF ROWS TO WRITE: ${rows.length}`)
