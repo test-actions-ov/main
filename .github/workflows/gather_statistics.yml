@@ -154,7 +154,7 @@ jobs:
                     const jobStart = new Date(workflowJob.started_at)
                     const jobEnd = new Date(workflowJob.completed_at)
                     const jobDuration = Math.abs(jobEnd - jobStart) / 1000 / 60
-                    const runner = workflowData.labels ? workflowData.labels[0] : 'No data'
+                    const runner = workflowJob.labels ? workflowJob.labels[0] : 'No data'
 
 
                     workflowRunStats['Jobs'].push({
@@ -201,8 +201,8 @@ jobs:
                     row[job.Job + '_Job_Runner'] = job.Runner;
                 });
                 rows.push(row);
-                if (!rows.length % 100) {
-                  console.log(`Done with ${rows.length}...`)
+                if (!(index % 100)) {
+                  console.log(`Done with ${index} rows...`)
                 }
             });
             
