@@ -1,24 +1,24 @@
-name: Tests on Linux
-on:
-  pull_request:
-  push:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  Build:
-    defaults:
-      run:
-        shell: bash
-    runs-on: ubuntu-latest
-    steps:
-      - name: Sample Stage
-        run: |
-          echo "123"
+#name: Tests on Linux
+#on:
+#  pull_request:
+#  push:
+#    branches:
+#      - main
+#
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.ref }}
+#  cancel-in-progress: true
+#
+#jobs:
+#  Build:
+#    defaults:
+#      run:
+#        shell: bash
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Sample Stage
+#        run: |
+#          echo "123"
 
 #      - name: Get GitHub Context Values
 #        run: |

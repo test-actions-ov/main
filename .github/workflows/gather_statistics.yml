@@ -16,7 +16,7 @@ jobs:
       ARTIFACTS_DIR: ${{ github.workspace }}/artifacts
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create Artifacts Directory
         run: mkdir -p ${{ env.ARTIFACTS_DIR }}
@@ -96,7 +96,7 @@ jobs:
             const workflowRuns = []
             const workflowRunsStats = []
 
-            for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
+            for (let pageNumber = 1; pageNumber <= 20; pageNumber++) {
             
                 console.log(`Collecting page #${pageNumber}.`)
 
@@ -128,6 +128,7 @@ jobs:
                 workflowRunStats['Run ID'] = runID
                 workflowRunStats['URL'] = workflowData.html_url
                 workflowRunStats['Author'] = workflowData.head_commit.author.name
+                workflowRunStats['Runner'] = workflowData.labels[0]
                 workflowRunStats['Source Branch'] = workflowData.head_branch
                 workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : undefined
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
@@ -163,7 +164,7 @@ jobs:
 
                     // The longest job out of those running in parallel
                     // use its completed_at time to determine when the pipeline ended
-                    if (workflowJob.name === 'CPU_Functional_Tests') {
+                    if (workflowJob.name === 'Python_Unit_Tests') {
                         pipelineEndDate = workflowJob.completed_at
                     }
                 }
@@ -186,6 +187,7 @@ jobs:
                     'Run ID': entry['Run ID'],
                     'URL': entry.URL,
                     'Author': entry.Author,
+                    'Runner': entry.Runner,
                     'Commit Time': entry['Commit Time'],
                     'Source Branch': entry['Source Branch'],
                     'Pipeline Started At': entry['Started At'],
