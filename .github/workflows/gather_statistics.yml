@@ -128,7 +128,7 @@ jobs:
                 workflowRunStats['Run ID'] = runID
                 workflowRunStats['URL'] = workflowData.html_url
                 workflowRunStats['Author'] = workflowData.head_commit.author.name
-                workflowRunStats['Runner'] = workflowData.labels[0]
+                workflowRunStats['Runner'] = workflowData.labels ? workflowData.labels[0] : 'No data'
                 workflowRunStats['Source Branch'] = workflowData.head_branch
                 workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : undefined
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
