@@ -102,7 +102,7 @@ jobs:
             const workflowRuns = []
             const workflowRunsStats = []
             
-            pagesToCollect = pagesToCollect > 20 ? 20 : pagesToCollect;
+            pagesToCollect = pagesToCollect > 10 ? 10 : pagesToCollect;
 
             for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
             
@@ -112,7 +112,7 @@ jobs:
                     'owner': org,
                     'repo': repositoryName,
                     'workflow_id': pipelineName,
-                    'status': 'completed',
+                    'status': 'success',
                     'created': dateToStartGatheringFrom,
                     'per_page': perPageCount,
                     'page': pageNumber
@@ -123,8 +123,8 @@ jobs:
                 workflowRuns.push(...workflowRunsDataPerPage.data.workflow_runs)
                 console.log(`workflowRuns LENGTH AFTER PAGE COLLECTION: ${workflowRuns.length}`)
                 
-                console.log(`Sleeping for 4 seconds.`)
-                await sleep(4 * 1000);
+                console.log(`Sleeping for 3 seconds.`)
+                await sleep(3 * 1000);
             }
             
             console.log('Aggregating data for XLSX')
