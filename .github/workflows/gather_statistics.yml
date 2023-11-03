@@ -10,7 +10,7 @@ jobs:
   Gather_Statistics:
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 2
       matrix:
         pipelineToCollect: ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml']
     defaults:
@@ -123,8 +123,8 @@ jobs:
                 workflowRuns.push(...workflowRunsDataPerPage.data.workflow_runs)
                 console.log(`workflowRuns LENGTH AFTER PAGE COLLECTION: ${workflowRuns.length}`)
                 
-                console.log(`Sleeping for 2 seconds.`)
-                await sleep(2 * 1000);
+                console.log(`Sleeping for 4 seconds.`)
+                await sleep(4 * 1000);
             }
             
             console.log('Aggregating data for XLSX')
