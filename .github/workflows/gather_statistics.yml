@@ -78,6 +78,8 @@ jobs:
             const pipelinesToCollect = ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml']
             
             for (const pipelineName of pipelinesToCollect) {
+            
+              console.log(`COLLECTING RUNS FOR ${pipelineName}`)
               
               // Check how many pipelines were executed
               const workflowRunsData = await github.rest.actions.listWorkflowRuns({
