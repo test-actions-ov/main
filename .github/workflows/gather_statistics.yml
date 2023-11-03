@@ -146,6 +146,7 @@ jobs:
             
                 let pipelineEndDate;
                 let workflowDuration = 0
+                let workflowDurationFromStartToFinish = 0
 
                 const workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
                     'owner': org,
@@ -165,7 +166,6 @@ jobs:
                     const jobDuration = Math.abs(jobEnd - jobStart) / 1000 / 60
                     const runner = workflowJob.labels ? workflowJob.labels[0] : 'No data'
 
-
                     workflowRunStats['Jobs'].push({
                         Job: workflowJob.name,
                         Duration: jobDuration,
@@ -181,6 +181,8 @@ jobs:
                         completed_at: workflowJob.completed_at
                       }
                     }
+            
+                    workflowDuration += jobDuration
                 }
                 workflowRunsStats.push(workflowRunStats)
             
@@ -189,10 +191,11 @@ jobs:
                 if (workflowData.run_started_at && pipelineEndDate) {
                     const start = new Date(workflowData.run_started_at)
                     const end = new Date(pipelineEndDate)
-                    workflowDuration = Math.abs(end - start) / 1000 / 60
+                    workflowDurationFromStartToFinish = Math.abs(end - start) / 1000 / 60
                 }
 
                 workflowRunStats['Total Duration'] = workflowDuration
+                workflowRunStats['Duration from Start to Finish'] = workflowDurationFromStartToFinish
             }
             
             console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
@@ -207,7 +210,8 @@ jobs:
                     'Source Branch': entry['Source Branch'],
                     'Pipeline Started At': entry['Started At'],
                     'Status': entry.Status,
-                    'Total Pipeline Duration (Mins)': entry['Total Duration']
+                    'Total Pipeline Duration (Mins)': entry['Total Duration'],
+                    'Duration from Start to Finish (Mins)': entry['Duration from Start to Finish']
                 };
                 entry.Jobs.forEach(function (job) {
                     row[job.Job + '_Job_Status'] = job.Status;
