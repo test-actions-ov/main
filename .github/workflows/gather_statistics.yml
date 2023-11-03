@@ -8,6 +8,11 @@ on:
 
 jobs:
   Gather_Statistics:
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        pipelineToCollect: ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml']
     defaults:
       run:
         shell: bash
@@ -75,156 +80,155 @@ jobs:
             // TODO: use context.payload.repository.name
             const repositoryName = 'openvino'
 
-            const pipelinesToCollect = ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml']
+            // const pipelinesToCollect = ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml']
             
-            for (const pipelineName of pipelinesToCollect) {
+            const pipelineName = `${{ matrix.pipelineToCollect }}`
             
-              console.log(`COLLECTING RUNS FOR ${pipelineName}`)
-              
-              // Check how many pipelines were executed
-              const workflowRunsData = await github.rest.actions.listWorkflowRuns({
-                'owner': org,
-                'repo': repositoryName,
-                'workflow_id': pipelineName,
-                'status': 'completed',
-                'created': dateToStartGatheringFrom,
-                'per_page': 1
-              })
-              
-              const perPageCount = 50
-              let pagesToCollect = Math.ceil(workflowRunsData.data.total_count / perPageCount)
-              console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
-              console.log(`PAGES TO COLLECT: ${pagesToCollect}`)
-              
-              const workflowRuns = []
-              const workflowRunsStats = []
-              
-              pagesToCollect = pagesToCollect > 20 ? 20 : pagesToCollect;
-  
-              for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
-              
-                  console.log(`Collecting page #${pageNumber}.`)
-  
-                  let workflowRunsDataPerPage = await github.rest.actions.listWorkflowRuns({
-                      'owner': org,
-                      'repo': repositoryName,
-                      'workflow_id': pipelineName,
-                      'status': 'completed',
-                      'created': dateToStartGatheringFrom,
-                      'per_page': perPageCount,
-                      'page': pageNumber
-                  })
-              
-                  console.log(`workflowsPerPageCount: ${workflowRunsDataPerPage.data.workflow_runs.length}`)
-  
-                  workflowRuns.push(...workflowRunsDataPerPage.data.workflow_runs)
-                  console.log(`workflowRuns LENGTH AFTER PAGE COLLECTION: ${workflowRuns.length}`)
-                  
-                  console.log(`Sleeping for 2 seconds.`)
-                  await sleep(2 * 1000);
-              }
-  
-              for (const workflowData of workflowRuns) {
-  
-                  const workflowRunStats = {}
-  
-                  const runID = workflowData.id
-  
-                  workflowRunStats['Run ID'] = runID
-                  workflowRunStats['URL'] = workflowData.html_url
-                  workflowRunStats['Author'] = workflowData.head_commit.author.name
-                  workflowRunStats['Source Branch'] = workflowData.head_branch
-                  workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : undefined
-                  workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
-                  workflowRunStats['Status'] = workflowData.conclusion
-                  workflowRunStats['Jobs'] = []
-              
-                  let pipelineEndDate;
-                  let workflowDuration = 0
-  
-                  const workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
-                      'owner': org,
-                      'repo': repositoryName,
-                      'run_id': runID
-                  })
-              
-                  let longestJob = {
-                    duration: 0,
-                    completed_at: undefined
-                  }
-                  
-                  for (const workflowJob of workflowJobs.data.jobs) {
-  
-                      const jobStart = new Date(workflowJob.started_at)
-                      const jobEnd = new Date(workflowJob.completed_at)
-                      const jobDuration = Math.abs(jobEnd - jobStart) / 1000 / 60
-                      const runner = workflowJob.labels ? workflowJob.labels[0] : 'No data'
-  
-  
-                      workflowRunStats['Jobs'].push({
-                          Job: workflowJob.name,
-                          Duration: jobDuration,
-                          Status: workflowJob.conclusion,
-                          Runner: runner
-                      })
-                      
-                      // The longest job out of those running in parallel
-                      // use its completed_at time to determine when the pipeline ended
-                      if (jobDuration > longestJob['duration']) {
-                        longestJob = {
-                          duration: jobDuration,
-                          completed_at: workflowJob.completed_at
-                        }
-                      }
-                  }
-                  workflowRunsStats.push(workflowRunStats)
-              
-                  pipelineEndDate = longestJob['completed_at']
-  
-                  if (workflowData.run_started_at && pipelineEndDate) {
-                      const start = new Date(workflowData.run_started_at)
-                      const end = new Date(pipelineEndDate)
-                      workflowDuration = Math.abs(end - start) / 1000 / 60
-                  }
-  
-                  workflowRunStats['Total Duration'] = workflowDuration
-              }
-              
-              console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
-  
-              let rows = [];
-              workflowRunsStats.forEach(function (entry, index) {
-                  const row = {
-                      'Run ID': entry['Run ID'],
-                      'URL': entry.URL,
-                      'Author': entry.Author,
-                      'Commit Time': entry['Commit Time'],
-                      'Source Branch': entry['Source Branch'],
-                      'Pipeline Started At': entry['Started At'],
-                      'Status': entry.Status,
-                      'Total Pipeline Duration (Mins)': entry['Total Duration']
-                  };
-                  entry.Jobs.forEach(function (job) {
-                      row[job.Job + '_Job_Status'] = job.Status;
-                      row[job.Job + '_Job_Duration (Mins)'] = job.Duration;
-                      row[job.Job + '_Job_Runner'] = job.Runner;
-                  });
-                  rows.push(row);
-                  if (!(index % 100)) {
-                    console.log(`Done with ${index} rows...`)
-                  }
-              });
-              
-              console.log(`TOTAL # OF ROWS TO WRITE: ${rows.length}`)
+            // Check how many pipelines were executed
+            const workflowRunsData = await github.rest.actions.listWorkflowRuns({
+              'owner': org,
+              'repo': repositoryName,
+              'workflow_id': pipelineName,
+              'status': 'completed',
+              'created': dateToStartGatheringFrom,
+              'per_page': 1
+            })
+            
+            const perPageCount = 50
+            let pagesToCollect = Math.ceil(workflowRunsData.data.total_count / perPageCount)
+            console.log(`TOTAL # OF COMPLETED RUNS: ${workflowRunsData.data.total_count}`)
+            console.log(`PAGES TO COLLECT: ${pagesToCollect}`)
+            
+            const workflowRuns = []
+            const workflowRunsStats = []
+            
+            pagesToCollect = pagesToCollect > 20 ? 20 : pagesToCollect;
+
+            for (let pageNumber = 1; pageNumber <= pagesToCollect; pageNumber++) {
+            
+                console.log(`Collecting page #${pageNumber}.`)
+
+                let workflowRunsDataPerPage = await github.rest.actions.listWorkflowRuns({
+                    'owner': org,
+                    'repo': repositoryName,
+                    'workflow_id': pipelineName,
+                    'status': 'completed',
+                    'created': dateToStartGatheringFrom,
+                    'per_page': perPageCount,
+                    'page': pageNumber
+                })
+            
+                console.log(`workflowsPerPageCount: ${workflowRunsDataPerPage.data.workflow_runs.length}`)
+
+                workflowRuns.push(...workflowRunsDataPerPage.data.workflow_runs)
+                console.log(`workflowRuns LENGTH AFTER PAGE COLLECTION: ${workflowRuns.length}`)
                 
-              const worksheet = XLSX.utils.json_to_sheet(rows);
-              const workbook = XLSX.utils.book_new();
-              XLSX.utils.book_append_sheet(workbook, worksheet, 'Workflow Runs');
-  
-              const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns_${pipelineName}.xlsx`
-  
-              XLSX.writeFile(workbook, artifactPath);
+                console.log(`Sleeping for 2 seconds.`)
+                await sleep(2 * 1000);
             }
+            
+            console.log('Aggregating data for XLSX')
+            
+            for (const workflowData of workflowRuns) {
+
+                const workflowRunStats = {}
+
+                const runID = workflowData.id
+
+                workflowRunStats['Run ID'] = runID
+                workflowRunStats['URL'] = workflowData.html_url
+                workflowRunStats['Author'] = workflowData.head_commit.author.name
+                workflowRunStats['Source Branch'] = workflowData.head_branch
+                workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : undefined
+                workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
+                workflowRunStats['Status'] = workflowData.conclusion
+                workflowRunStats['Jobs'] = []
+            
+                let pipelineEndDate;
+                let workflowDuration = 0
+
+                const workflowJobs = await github.rest.actions.listJobsForWorkflowRun({
+                    'owner': org,
+                    'repo': repositoryName,
+                    'run_id': runID
+                })
+            
+                let longestJob = {
+                  duration: 0,
+                  completed_at: undefined
+                }
+                
+                for (const workflowJob of workflowJobs.data.jobs) {
+
+                    const jobStart = new Date(workflowJob.started_at)
+                    const jobEnd = new Date(workflowJob.completed_at)
+                    const jobDuration = Math.abs(jobEnd - jobStart) / 1000 / 60
+                    const runner = workflowJob.labels ? workflowJob.labels[0] : 'No data'
+
+
+                    workflowRunStats['Jobs'].push({
+                        Job: workflowJob.name,
+                        Duration: jobDuration,
+                        Status: workflowJob.conclusion,
+                        Runner: runner
+                    })
+                    
+                    // The longest job out of those running in parallel
+                    // use its completed_at time to determine when the pipeline ended
+                    if (jobDuration > longestJob['duration']) {
+                      longestJob = {
+                        duration: jobDuration,
+                        completed_at: workflowJob.completed_at
+                      }
+                    }
+                }
+                workflowRunsStats.push(workflowRunStats)
+            
+                pipelineEndDate = longestJob['completed_at']
+
+                if (workflowData.run_started_at && pipelineEndDate) {
+                    const start = new Date(workflowData.run_started_at)
+                    const end = new Date(pipelineEndDate)
+                    workflowDuration = Math.abs(end - start) / 1000 / 60
+                }
+
+                workflowRunStats['Total Duration'] = workflowDuration
+            }
+            
+            console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
+
+            let rows = [];
+            workflowRunsStats.forEach(function (entry, index) {
+                const row = {
+                    'Run ID': entry['Run ID'],
+                    'URL': entry.URL,
+                    'Author': entry.Author,
+                    'Commit Time': entry['Commit Time'],
+                    'Source Branch': entry['Source Branch'],
+                    'Pipeline Started At': entry['Started At'],
+                    'Status': entry.Status,
+                    'Total Pipeline Duration (Mins)': entry['Total Duration']
+                };
+                entry.Jobs.forEach(function (job) {
+                    row[job.Job + '_Job_Status'] = job.Status;
+                    row[job.Job + '_Job_Duration (Mins)'] = job.Duration;
+                    row[job.Job + '_Job_Runner'] = job.Runner;
+                });
+                rows.push(row);
+                if (!(index % 100)) {
+                  console.log(`Done with ${index} rows...`)
+                }
+            });
+            
+            console.log(`TOTAL # OF ROWS TO WRITE: ${rows.length}`)
+              
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Workflow Runs');
+
+            const artifactPath = `${{ env.ARTIFACTS_DIR }}/workflowRuns_${pipelineName}.xlsx`
+
+            XLSX.writeFile(workbook, artifactPath);
 
       - name: Upload gathered data
         uses: actions/upload-artifact@v3
