@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        pipelineToCollect: ['linux_conditional_compilation.yml', 'linux_riscv.yml']
-        # pipelineToCollect: ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml']
+        pipelineToCollect: ['webassembly.yml']
+        # pipelineToCollect: ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml', 'webassembly.yml']
     defaults:
       run:
         shell: bash
