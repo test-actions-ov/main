@@ -35,6 +35,9 @@ jobs:
             console.log(context.runId)
             console.log(context.payload.repository.full_name)
       
+      - name: Check Head Ref
+        run: echo ${{ github.head_ref }}
+      
       - uses: actions/setup-node@v3
         with:
           node-version: 16
