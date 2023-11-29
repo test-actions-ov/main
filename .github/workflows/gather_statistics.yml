@@ -156,6 +156,9 @@ jobs:
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
+                console.log(JSON.stringify(workflowData.pull_requests))
+                console.log(JSON.stringify(workflowData.pull_requests))
+                console.log(JSON.stringify(workflowData.pull_requests))
                 workflowRunStats['Pull Request URL'] = workflowData.pull_requests ? workflowData.pull_requests[0].url : 'EMPTY'
                 
                 workflowRunStats['Labels'] = 'EMPTY'
