@@ -159,11 +159,11 @@ jobs:
                 console.log(JSON.stringify(workflowData.pull_requests))
                 console.log(JSON.stringify(workflowData.pull_requests))
                 console.log(JSON.stringify(workflowData.pull_requests))
-                workflowRunStats['Pull Request URL'] = workflowData.pull_requests ? workflowData.pull_requests[0].url : 'EMPTY'
+                workflowRunStats['Pull Request URL'] = workflowData.pull_requests.length ? workflowData.pull_requests[0].url : 'EMPTY'
                 
                 workflowRunStats['Labels'] = 'EMPTY'
                 
-                const pullRequestNumber = workflowData.pull_requests ? workflowData.pull_requests[0].number : undefined
+                const pullRequestNumber = workflowData.pull_requests.length ? workflowData.pull_requests[0].number : undefined
                 if (pullRequestNumber) {
                   workflowRunStats['Labels'] = await getLabelsForPR(pullRequestNumber)
                 }
