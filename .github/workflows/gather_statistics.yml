@@ -156,12 +156,13 @@ jobs:
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
+                workflowRunStats['Pull Request URL'] = workflowData.pull_requests ? workflowData.pull_requests[0].url : 'EMPTY'
                 
-                workflowRunStats['Labels'] = "EMPTY"
+                workflowRunStats['Labels'] = 'EMPTY'
                 
-                const pullRequest = workflowData.pull_requests ? workflowData.pull_requests[0] : undefined
-                if (pullRequest) {
-                  workflowRunStats['Labels'] = await getLabelsForPR(pullRequest)
+                const pullRequestNumber = workflowData.pull_requests ? workflowData.pull_requests[0].number : undefined
+                if (pullRequestNumber) {
+                  workflowRunStats['Labels'] = await getLabelsForPR(pullRequestNumber)
                 }
             
                 let pipelineEndDate;
@@ -229,6 +230,7 @@ jobs:
                     'Author': entry.Author,
                     'Commit Time': entry['Commit Time'],
                     'Source Branch': entry['Source Branch'],
+                    'Pull Request URL': entry['Pull Request URL'],
                     'Pipeline Started At': entry['Started At'],
                     'Status': entry.Status,
                     'Labels': entry.Labels,
