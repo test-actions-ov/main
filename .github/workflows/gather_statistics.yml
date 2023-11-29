@@ -49,8 +49,28 @@ jobs:
             const fs = require('fs');
             const XLSX = require('xlsx');
             
+            // TODO: use context.payload.repository.organization
+            const org = 'openvinotoolkit'
+            
+            // TODO: use context.payload.repository.name
+            const repositoryName = 'openvino'
+            
             function sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            function getLabelsForPR(prNumber) {
+              const labels = []
+              const prInfo = await github.rest.pulls.get({
+                'owner': org,
+                'repo': repositoryName,
+                'pull_number': prNumber,
+              });
+              
+              for (const labelInfo of prInfo.labels) {
+                labels.push(labelInfo.name)
+              }
+              return labels.toString()
             }
             
             const date = new Date();
@@ -74,12 +94,6 @@ jobs:
             // TODO: use dynamic date
             const dateToStartGatheringFrom = `>=2023-07-05`
             console.log(`dateToStartGatheringFrom: ${dateToStartGatheringFrom}`)
-            
-            // TODO: use context.payload.repository.organization
-            const org = 'openvinotoolkit'
-            
-            // TODO: use context.payload.repository.name
-            const repositoryName = 'openvino'
             
             const pipelineName = `${{ matrix.pipelineToCollect }}`
             
@@ -142,6 +156,13 @@ jobs:
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
+                
+                workflowRunStats['Labels'] = "EMPTY"
+                
+                const pullRequest = workflowData.pull_requests ? workflowData.pull_requests[0] : undefined
+                if (pullRequest) {
+                  workflowRunStats['Labels'] = getLabelsForPR(pullRequest)
+                }
             
                 let pipelineEndDate;
                 let workflowDuration = 0
@@ -183,7 +204,6 @@ jobs:
             
                     workflowDuration += jobDuration
                 }
-                workflowRunsStats.push(workflowRunStats)
             
                 pipelineEndDate = longestJob['completed_at']
 
@@ -195,6 +215,8 @@ jobs:
 
                 workflowRunStats['Total Duration'] = workflowDuration
                 workflowRunStats['Duration from Start to Finish'] = workflowDurationFromStartToFinish
+            
+                workflowRunsStats.push(workflowRunStats)
             }
             
             console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
@@ -209,6 +231,7 @@ jobs:
                     'Source Branch': entry['Source Branch'],
                     'Pipeline Started At': entry['Started At'],
                     'Status': entry.Status,
+                    'Labels': entry.Labels,
                     'Total Pipeline Duration (Mins)': entry['Total Duration'],
                     'Duration from Start to Finish (Mins)': entry['Duration from Start to Finish']
                 };
