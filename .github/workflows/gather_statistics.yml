@@ -152,11 +152,6 @@ jobs:
                     'repo': repositoryName,
                     'run_id': runID
                 })
-            
-                let longestJob = {
-                  duration: 0,
-                  completed_at: undefined
-                }
                 
                 for (const workflowJob of workflowJobs.data.jobs) {
 
@@ -172,20 +167,15 @@ jobs:
                         Runner: runner
                     })
                     
-                    // The longest job out of those running in parallel
-                    // use its completed_at time to determine when the pipeline ended
-                    if (jobDuration > longestJob['duration']) {
-                      longestJob = {
-                        duration: jobDuration,
-                        completed_at: workflowJob.completed_at
-                      }
+                    // Use the "completed_at" time of the overall_status_check job to determine when the pipeline ended
+                    if (workflowJob.name.includes('ci/gha_overall_status')) {
+                      pipelineEndDate = workflowJob.completed_at
                     }
             
                     workflowDuration += jobDuration
                 }
                 workflowRunsStats.push(workflowRunStats)
             
-                pipelineEndDate = longestJob['completed_at']
 
                 if (workflowData.run_started_at && pipelineEndDate) {
                     const start = new Date(workflowData.run_started_at)
