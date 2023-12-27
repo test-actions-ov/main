@@ -49,28 +49,8 @@ jobs:
             const fs = require('fs');
             const XLSX = require('xlsx');
             
-            // TODO: use context.payload.repository.organization
-            const org = 'openvinotoolkit'
-            
-            // TODO: use context.payload.repository.name
-            const repositoryName = 'openvino'
-            
             function sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
-            }
-            
-            async function getLabelsForPR(prNumber) {
-              const labels = []
-              const prInfo = await github.rest.pulls.get({
-                'owner': org,
-                'repo': repositoryName,
-                'pull_number': prNumber,
-              });
-              
-              for (const labelInfo of prInfo.labels) {
-                labels.push(labelInfo.name)
-              }
-              return labels.toString()
             }
             
             const date = new Date();
@@ -94,6 +74,12 @@ jobs:
             // TODO: use dynamic date
             const dateToStartGatheringFrom = `>=2023-07-05`
             console.log(`dateToStartGatheringFrom: ${dateToStartGatheringFrom}`)
+            
+            // TODO: use context.payload.repository.organization
+            const org = 'openvinotoolkit'
+            
+            // TODO: use context.payload.repository.name
+            const repositoryName = 'openvino'
             
             const pipelineName = `${{ matrix.pipelineToCollect }}`
             
@@ -152,24 +138,10 @@ jobs:
                 workflowRunStats['URL'] = workflowData.html_url
                 workflowRunStats['Author'] = workflowData.head_commit.author.name
                 workflowRunStats['Source Branch'] = workflowData.head_branch
-                if (workflowData.head_branch === 'master') {
-                  continue;
-                }
                 workflowRunStats['Started At'] = workflowData.run_started_at ? workflowData.run_started_at : undefined
                 workflowRunStats['Commit Time'] = workflowData.head_commit && workflowData.head_commit.timestamp ? workflowData.head_commit.timestamp : 'No data'
                 workflowRunStats['Status'] = workflowData.conclusion
                 workflowRunStats['Jobs'] = []
-                console.log(JSON.stringify(workflowData.pull_requests))
-                console.log(JSON.stringify(workflowData.pull_requests))
-                console.log(JSON.stringify(workflowData.pull_requests))
-                workflowRunStats['Pull Request URL'] = workflowData.pull_requests.length ? workflowData.pull_requests[0].url : 'EMPTY'
-                
-                workflowRunStats['Labels'] = 'EMPTY'
-                
-                const pullRequestNumber = workflowData.pull_requests.length ? workflowData.pull_requests[0].number : undefined
-                if (pullRequestNumber) {
-                  workflowRunStats['Labels'] = await getLabelsForPR(pullRequestNumber)
-                }
             
                 let pipelineEndDate;
                 let workflowDuration = 0
@@ -211,6 +183,7 @@ jobs:
             
                     workflowDuration += jobDuration
                 }
+                workflowRunsStats.push(workflowRunStats)
             
                 pipelineEndDate = longestJob['completed_at']
 
@@ -222,8 +195,6 @@ jobs:
 
                 workflowRunStats['Total Duration'] = workflowDuration
                 workflowRunStats['Duration from Start to Finish'] = workflowDurationFromStartToFinish
-            
-                workflowRunsStats.push(workflowRunStats)
             }
             
             console.log(`TOTAL LENGTH OF workflowRunsStats: ${workflowRunsStats.length}`)
@@ -236,10 +207,8 @@ jobs:
                     'Author': entry.Author,
                     'Commit Time': entry['Commit Time'],
                     'Source Branch': entry['Source Branch'],
-                    'Pull Request URL': entry['Pull Request URL'],
                     'Pipeline Started At': entry['Started At'],
                     'Status': entry.Status,
-                    'Labels': entry.Labels,
                     'Total Pipeline Duration (Mins)': entry['Total Duration'],
                     'Duration from Start to Finish (Mins)': entry['Duration from Start to Finish']
                 };
