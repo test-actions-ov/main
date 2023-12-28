@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        pipelineToCollect: ['android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml', 'webassembly.yml']
+        pipelineToCollect: ['linux.yml', 'windows.yml']
         # pipelineToCollect: ['linux.yml', 'android_arm64.yml', 'fedora.yml', 'linux_conditional_compilation.yml', 'linux_riscv.yml', 'webassembly.yml']
     defaults:
       run:
@@ -90,6 +90,7 @@ jobs:
               'workflow_id': pipelineName,
               'status': 'completed',
               'created': dateToStartGatheringFrom,
+              'branch': 'master',
               'per_page': 1
             })
             
@@ -114,6 +115,7 @@ jobs:
                     'status': 'success',
                     'created': dateToStartGatheringFrom,
                     'per_page': perPageCount,
+                    'branch': 'master',
                     'page': pageNumber
                 })
             
